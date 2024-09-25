@@ -1,4 +1,4 @@
-import problem2 from '../problem2.js';
+const  problem2  = require("../problem2");
 
 let filepath = "../data/lipsum.txt";
 

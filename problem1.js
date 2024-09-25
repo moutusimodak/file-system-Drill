@@ -1,44 +1,53 @@
-const fs = await import("fs/promises");
-import path from 'path';
+const fs = require('fs')
+const path = require('path');
 
-async function createDir(dirPath, numFiles) {
-    try {
-        await fs.mkdir(dirPath, { recursive: true });
-        console.log("Directory created successfully");
-        await createRandomFiles(dirPath, numFiles);
-    } catch (err) {
-        console.error("Error creating directory:", err);
-    }
+function CreateDir(dirPath, numFiles) {
+    fs.mkdir(dirPath, (err) => {
+        if (err) {
+            console.error("error to create directory", err)
+        } else {
+            console.log("Directory created successfully");
+            createRandomFiles(dirPath, numFiles)
+        }
+    })
 }
+    
 
-async function createRandomFiles(dirPath, numFiles) {
-    const filePaths = []; 
-
+function createRandomFiles(dirPath, numFiles) {
     for (let i = 0; i < numFiles; i++) {
+
         const filepath = path.join(dirPath, `randomFile${i}.json`);
-        const data = JSON.stringify({ id: i, name: `random ${i}` });
+        const data = JSON.stringify({ id: i, name: `random ${i}` })
 
-        try {
-            await fs.writeFile(filepath, data);
-            console.log("File created successfully:", filepath);
-            filePaths.push(filepath); 
-        } catch (err) {
-            console.error("Error creating file:", err);
-        }
-    }
+        fs.writeFile(filepath, data, (err) => {
+            if (err) {
+                console.error("Error to create files", err)
+            } else {
+                console.log("File created successfully", filepath);
+                DeleteRandomFiles(filepath)
+            }
 
-    await deleteRandomFiles(filePaths); 
+        })
 }
 
-async function deleteRandomFiles(filePaths) {
-    for (const filepath of filePaths) {
-        try {
-            await fs.unlink(filepath);
-            console.log("File deleted:", filepath);
-        } catch (err) {
+    
+        
+function DeleteRandomFiles(filepath) {
+    fs.unlink(filepath, function (err) {
+        if (err) {
             console.error("Error deleting file:", err);
+        } else {
+            console.log("File deleted:", filepath);
         }
-    }
+    });
+
+}
 }
 
-export default createDir;
+
+
+module.exports = CreateDir
+
+
+
+

@@ -1,9 +1,7 @@
-import createDir from '../problem1.js';
-import path from 'path';
+const CreateDir = require('../problem1'); 
+const path = require('path');
+
+const RandomDirectory = path.join(__dirname, './jsonFiles');
 
 
-const RandomDirectory = path.join(process.cwd(), './jsonFiles');
-
-createDir(RandomDirectory, 4);
-
-
+CreateDir(RandomDirectory, 4);
