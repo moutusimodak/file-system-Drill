@@ -1,44 +1,70 @@
-const fs = await import("fs/promises");
+import fs from 'fs';
 import path from 'path';
 
-async function createDir(dirPath, numFiles) {
-    try {
-        await fs.mkdir(dirPath, { recursive: true });
-        console.log("Directory created successfully");
-        await createRandomFiles(dirPath, numFiles);
-    } catch (err) {
-        console.error("Error creating directory:", err);
-    }
+function createDirectory(dirPath) {
+    return new Promise((resolve, reject) => {
+        fs.mkdir(dirPath, (err) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(dirPath);
+            }
+        });
+    });
 }
 
-async function createRandomFiles(dirPath, numFiles) {
-    const filePaths = []; 
+function createRandomFiles(dirPath, numFiles) {
+    let filePromises = [];
 
     for (let i = 0; i < numFiles; i++) {
         const filepath = path.join(dirPath, `randomFile${i}.json`);
         const data = JSON.stringify({ id: i, name: `random ${i}` });
+        const allFilePromises = new Promise((resolve, reject) => {
+            fs.writeFile(filepath, data, (err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(filepath); 
+                }
+            });
+        });
 
-        try {
-            await fs.writeFile(filepath, data);
-            console.log("File created successfully:", filepath);
-            filePaths.push(filepath); 
-        } catch (err) {
-            console.error("Error creating file:", err);
-        }
+        filePromises.push(allFilePromises); 
     }
 
-    await deleteRandomFiles(filePaths); 
+    return Promise.all(filePromises).then(() => dirPath); 
 }
 
-async function deleteRandomFiles(filePaths) {
-    for (const filepath of filePaths) {
-        try {
-            await fs.unlink(filepath);
-            console.log("File deleted:", filepath);
-        } catch (err) {
-            console.error("Error deleting file:", err);
-        }
-    }
+function deleteRandomFiles(dirPath) {
+    let fileDeletedPromises = [];
+
+    return new Promise((resolve, reject) => {
+        fs.readdir(dirPath, (err, filePaths) => {
+            if (err) {
+                reject(err);
+            } else {
+                for (const filePath of filePaths) {
+                    let filePathList = path.join(dirPath, filePath);
+
+                    const deletePromise = new Promise((resolve, reject) => {
+                        fs.unlink(filePathList, (err) => {
+                            if (err) {
+                                reject(err);
+                            } else {
+                                resolve(); 
+                            }
+                        });
+                    });
+
+                    fileDeletedPromises.push(deletePromise); 
+                }
+
+                Promise.all(fileDeletedPromises)
+                    .then(() => resolve("All files deleted"))
+                    .catch(reject); 
+            }
+        });
+    });
 }
 
-export default createDir;
+export { createDirectory, createRandomFiles, deleteRandomFiles };
