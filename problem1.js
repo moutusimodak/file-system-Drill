@@ -1,44 +1,71 @@
-const fs = await import("fs/promises");
+import fs from 'fs/promises'; 
 import path from 'path';
 
-async function createDir(dirPath, numFiles) {
-    try {
-        await fs.mkdir(dirPath, { recursive: true });
-        console.log("Directory created successfully");
-        await createRandomFiles(dirPath, numFiles);
-    } catch (err) {
-        console.error("Error creating directory:", err);
-    }
+function createDir(dirPath) {
+    return fs.mkdir(dirPath, { recursive: true })
+    .then(()=>{
+        console.log('Directory created');
+       
+    })
+    .catch((err)=>{
+        console.error(err);
+    })
 }
 
-async function createRandomFiles(dirPath, numFiles) {
+
+
+function createRandomFiles(dirPath, numFiles) {
     const filePaths = []; 
+    const filePromises = []; 
 
     for (let i = 0; i < numFiles; i++) {
         const filepath = path.join(dirPath, `randomFile${i}.json`);
         const data = JSON.stringify({ id: i, name: `random ${i}` });
 
-        try {
-            await fs.writeFile(filepath, data);
-            console.log("File created successfully:", filepath);
-            filePaths.push(filepath); 
-        } catch (err) {
-            console.error("Error creating file:", err);
-        }
+        const filePromise = fs.writeFile(filepath, data)
+            .then(() => {
+                console.log("File created successfully:", filepath);
+                filePaths.push(filepath);
+            })
+            .catch(err => {
+                console.error(err);
+            });
+
+        filePromises.push(filePromise); 
     }
 
-    await deleteRandomFiles(filePaths); 
+    return Promise.all(filePromises)
+        .then(()=>{
+            return filePaths
+        })
+        .catch(err => {
+            console.error(err);
+        });
 }
 
-async function deleteRandomFiles(filePaths) {
+function deleteRandomFiles(dirPath, filePaths) {
+    let fileDeletedPromises = [];
+
     for (const filepath of filePaths) {
-        try {
-            await fs.unlink(filepath);
-            console.log("File deleted:", filepath);
-        } catch (err) {
-            console.error("Error deleting file:", err);
-        }
+        const filePathList = filepath; 
+        const deletePromise = fs.unlink(filePathList)
+            .then(() => {
+                console.log("File deleted:", filepath);
+            })
+            .catch((err) => {
+                console.error(err);
+            });
+        fileDeletedPromises.push(deletePromise); 
     }
+
+    return Promise.all(fileDeletedPromises)
+        .then(() => {
+            console.log("All files deleted");
+        })
+        .catch(err => {
+            console.error(err);
+        });
 }
 
-export default createDir;
+
+export{createDir,createRandomFiles,deleteRandomFiles}
