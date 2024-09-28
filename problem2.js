@@ -3,7 +3,7 @@ import path from 'path';
 
 //1. Read the given file lipsum.txt
 
-async function problem2(filepath) {
+async function readSourceFile(filepath) {
     const data = await fs.readFile(filepath, 'utf-8')
 
     try {
@@ -12,7 +12,7 @@ async function problem2(filepath) {
         await ConvertedUpperCase(data)
 
 
-    }
+     }
     catch (err) {
         console.error("Error to read a file ", err);
     }
@@ -25,7 +25,6 @@ async function ConvertedUpperCase(data) {
     const upperCaseData = data.toUpperCase();
     let newFileName = 'filename1.txt'
     let newPath = path.join(process.cwd(), newFileName)
-    // console.log(upperCaseData);
 
     try {
         console.log("Successfully written");
@@ -67,22 +66,22 @@ async function ConvertedToLowerCase(filePath) {
 
 
 // 4. Read the new files, sort the content, write it out to a new file. Store the name of the new file in filenames.txt
-async function sortedContent(newFileName, newPath) {
+async function sortedContent(newFileName) {
 
     try {
         const lowerCaseData = await fs.readFile(newFileName, 'utf-8');
-        // console.log("Reading : ", lowerCaseData);
+       
 
-        const sorteddata = lowerCaseData.split('').sort().join('');
+        const sortedData = lowerCaseData.split('').sort().join('');
       
-        console.log("sorted content is : ", sorteddata);
+        console.log("sorted content is : ", sortedData);
 
 
         let newFile = 'filename3.txt';
         let newPath = path.join(process.cwd(), newFile)
 
-        await fs.writeFile(newPath, sorteddata)
-        //console.log("Successfully written the data");
+        await fs.writeFile(newPath, sortedData)
+     
         fs.appendFile('filenames.txt', newFile + '\n', () => { });
 
         await deleteAllFiles(sorteddata)
@@ -121,7 +120,7 @@ async function deleteAllFiles() {
 
 }
 
-export default problem2;
+export default readSourceFile;
 
 
 
