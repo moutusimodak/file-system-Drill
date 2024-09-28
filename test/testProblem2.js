@@ -1,5 +1,20 @@
-const  problem2  = require("../problem2");
+const { readDataFile, convertedToUpperCase, convertedToLowerCase, sortedContent, deleteAllFiles } = require("../problem2");
 
-let filepath = "../data/lipsum.txt";
+let filePath = "../data/lipsum.txt";
 
-problem2(filepath);
+readDataFile(filePath, (data) => {
+
+    convertedToUpperCase(data, (upperCaseFilePath) => {
+
+        convertedToLowerCase(upperCaseFilePath, (lowerCaseFilePath) => {
+            
+            sortedContent(lowerCaseFilePath, (newFileData) => {
+
+                deleteAllFiles(newFileData)
+
+            })
+        });
+    });
+});
+
+

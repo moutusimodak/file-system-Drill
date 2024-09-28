@@ -1,52 +1,62 @@
 const fs = require('fs')
 const path = require('path');
 
-function CreateDir(dirPath, numFiles) {
-    fs.mkdir(dirPath, (err) => {
+function createDir(dirPath, callback) {
+    fs.mkdir(dirPath, { recursive: true }, (err) => {
         if (err) {
             console.error("error to create directory", err)
         } else {
             console.log("Directory created successfully");
-            createRandomFiles(dirPath, numFiles)
+            callback()
         }
     })
 }
-    
 
-function createRandomFiles(dirPath, numFiles) {
+
+function createRandomFiles(dirPath, numFiles, callback) {
+    let files = [];
+    let counter =0
+
     for (let i = 0; i < numFiles; i++) {
-
         const filepath = path.join(dirPath, `randomFile${i}.json`);
-        const data = JSON.stringify({ id: i, name: `random ${i}` })
-
+        const data = JSON.stringify({ id: i, name: `random ${i}` });
         fs.writeFile(filepath, data, (err) => {
             if (err) {
-                console.error("Error to create files", err)
-            } else {
-                console.log("File created successfully", filepath);
-                DeleteRandomFiles(filepath)
+                console.error(err);
+
             }
+            else {
+                console.log("file created successfully");
+                
+                files.push(filepath);
+            }
+            counter++;
 
+            if (counter === numFiles) {
+                callback(files);
+               
+            }
+        });
+
+    }
+}
+
+
+
+function deleteRandomFiles(paths) {
+    paths.forEach(file => {
+        fs.unlink(file, (err) => {
+            if (err) {
+                console.error(err);
+            } else {
+                console.log("file deleted successfully....");
+
+            }
         })
-}
-
-    
-        
-function DeleteRandomFiles(filepath) {
-    fs.unlink(filepath, function (err) {
-        if (err) {
-            console.error("Error deleting file:", err);
-        } else {
-            console.log("File deleted:", filepath);
-        }
     });
-
-}
 }
 
-
-
-module.exports = CreateDir
+module.exports = { createDir, createRandomFiles, deleteRandomFiles }
 
 
 
