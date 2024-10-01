@@ -32,12 +32,15 @@ function ConvertedUpperCase(data) {
 
             return fs.appendFile('filenames.txt', newFileName + '\n', () => { })
 
-                .then(() => {
-                    return ConvertedToLowerCase(newPath);
-                })
-
+               
 
         })
+        .then(() => {
+            console.log("file appended successfully");
+            
+            return ConvertedToLowerCase(newPath);
+        })
+
         .catch((err) => {
             console.error(err);
 
